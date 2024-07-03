@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #00F;
+  color: #FFF;
+}
+
+audio {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+}

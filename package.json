@@ -1,12 +1,14 @@
 {
-  "name": "str-reactive-visualization",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/juanfuent-es/srt-reactive-visualization",
-  "author": "juanfuent-es",
-  "license": "GNU",
-  "private": false,
-  "dependencies": {
-    "gsap": "^3.12.5"
+  "name": "rst",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.3.1"
   }
 }
