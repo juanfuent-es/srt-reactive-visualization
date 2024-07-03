@@ -1,0 +1,12 @@
+{
+  "name": "str-reactive-visualization",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/juanfuent-es/srt-reactive-visualization",
+  "author": "juanfuent-es",
+  "license": "GNU",
+  "private": false,
+  "dependencies": {
+    "gsap": "^3.12.5"
+  }
+}
