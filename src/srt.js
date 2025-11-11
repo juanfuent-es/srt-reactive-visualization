@@ -8,31 +8,49 @@ export default class Srt {
     }
 
     parse() {
-        let lines = this.srtContent.split('\n\r\n');
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-            let origin = line.split('\n');
-            if (origin.length >= 3) {
-                // counter
-                let counter = origin[0];
-                // time
-                let timeLine = origin[1];
-                let startText = timeLine.match(/^[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]/)[0];
-                let endText = timeLine.match(/\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]/)[0].replace(' ', '');
-                let startDate = this.stringToDate(startText);
-                let endDate = this.stringToDate(endText);
-                // subtitle 
-                let subtitle = '';
-                for (let j = 2; j < origin.length; j++) {
-                    subtitle = subtitle + origin[j] + '\n';
+        // Normalizar line breaks: reemplazar \r\n con \n y luego dividir por bloques vacíos
+        let normalized = this.srtContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        let blocks = normalized.split(/\n\n+/);
+        
+        for (let i = 0; i < blocks.length; i++) {
+            let block = blocks[i].trim();
+            if (!block) continue;
+            
+            let lines = block.split('\n');
+            if (lines.length < 3) continue;
+            
+            // counter (primera línea)
+            let counter = lines[0].trim();
+            
+            // time (segunda línea)
+            let timeLine = lines[1].trim();
+            let timeMatch = timeLine.match(/(\d{2}:\d{2}:\d{2}[,\.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,\.]\d{3})/);
+            
+            if (!timeMatch) continue;
+            
+            // Normalizar comas/puntos en los tiempos
+            let startText = timeMatch[1].replace('.', ',');
+            let endText = timeMatch[2].replace('.', ',');
+            
+            let startDate = this.stringToDate(startText);
+            let endDate = this.stringToDate(endText);
+            
+            // subtitle (resto de líneas)
+            let subtitle = '';
+            for (let j = 2; j < lines.length; j++) {
+                if (lines[j].trim()) {
+                    subtitle += (subtitle ? '\n' : '') + lines[j].trim();
                 }
+            }
+            
+            if (subtitle) {
                 // push to list
                 this.lines.push({
                     counter: counter,
                     subtitle: subtitle,
                     start: this.dateToObject(startDate),
                     end: this.dateToObject(endDate)
-                })
+                });
             }
         }
     }
@@ -125,5 +143,95 @@ export default class Srt {
         }
         if (count == n) return i - 1;
         return NaN;
+    }
+
+    /**
+     * Convierte un tiempo en segundos a un objeto Date
+     * @param {number} seconds - Tiempo en segundos
+     * @returns {Date} Objeto Date correspondiente
+     */
+    secondsToDate(seconds) {
+        const date = new Date(1970, 1, 1, 0, 0, 0, 0);
+        const totalMs = seconds * 1000;
+        date.setTime(totalMs);
+        return date;
+    }
+
+    /**
+     * Convierte un objeto Date a segundos
+     * @param {Date} date - Objeto Date
+     * @returns {number} Tiempo en segundos
+     */
+    dateToSeconds(date) {
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getSeconds();
+        const milliseconds = date.getMilliseconds();
+        return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
+    }
+
+    /**
+     * Obtiene el subtítulo activo para un tiempo dado en segundos
+     * @param {number} currentTime - Tiempo actual en segundos
+     * @returns {Object|null} Objeto con la información del subtítulo o null si no hay subtítulo activo
+     */
+    getSubtitleAtTime(currentTime) {
+        const currentDate = this.secondsToDate(currentTime);
+        
+        for (let i = 0; i < this.lines.length; i++) {
+            const line = this.lines[i];
+            const startTime = this.dateToSeconds(line.start.time);
+            const endTime = this.dateToSeconds(line.end.time);
+            
+            if (currentTime >= startTime && currentTime <= endTime) {
+                return {
+                    ...line,
+                    index: i,
+                    startSeconds: startTime,
+                    endSeconds: endTime,
+                    text: line.subtitle.trim()
+                };
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Obtiene todos los subtítulos
+     * @returns {Array} Array de todos los subtítulos
+     */
+    getAllSubtitles() {
+        return this.lines.map((line, index) => ({
+            ...line,
+            index: index,
+            startSeconds: this.dateToSeconds(line.start.time),
+            endSeconds: this.dateToSeconds(line.end.time),
+            text: line.subtitle.trim()
+        }));
+    }
+
+    /**
+     * Obtiene el siguiente subtítulo después de un tiempo dado
+     * @param {number} currentTime - Tiempo actual en segundos
+     * @returns {Object|null} Siguiente subtítulo o null
+     */
+    getNextSubtitle(currentTime) {
+        for (let i = 0; i < this.lines.length; i++) {
+            const line = this.lines[i];
+            const startTime = this.dateToSeconds(line.start.time);
+            
+            if (startTime > currentTime) {
+                return {
+                    ...line,
+                    index: i,
+                    startSeconds: startTime,
+                    endSeconds: this.dateToSeconds(line.end.time),
+                    text: line.subtitle.trim()
+                };
+            }
+        }
+        
+        return null;
     }
 }

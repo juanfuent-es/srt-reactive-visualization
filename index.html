@@ -1,23 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <main id="app">
-      <!-- @ref: https://developer.mozilla.org/es/docs/Web/HTML/Element/track -->
-      <audio controls>
-        <source src="/audio-nitro-vs-sweet-pain.mp3">
-        <track src="/subtitles.vtt" label="Español" kind="subtitles" language="es" enabled>
-      </audio>
-      <video controls src="/video.mp4">
-        <!-- @ref: https://interactive-examples.mdn.mozilla.net/media/examples/friday.vtt -->
-        <track default src="/subtitles.vtt" label="Español" kind="subtitles" srclang="es" enabled>
-      </video>
-    </main>
-    <script type="module" src="/main.js"></script>
-  </body>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="icon" type="image/svg+xml" href="/vite.svg">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vite App</title>
+	</head>
+	<body>
+		<main id="app">
+			<!-- Visualización de subtítulos -->
+			<div id="subtitle-display" class="subtitle-display"></div>
+
+			<!-- @ref: https://developer.mozilla.org/es/docs/Web/HTML/Element/track -->
+			<audio controls>
+				<source src="/audio.mp3">
+				<track src="/subtitles.vtt" label="Español" kind="subtitles" language="es" enabled>
+			</audio>
+			<video controls src="/video.mp4">
+				<!-- @ref: https://interactive-examples.mdn.mozilla.net/media/examples/friday.vtt -->
+				<track default src="/subtitles.vtt" label="Español" kind="subtitles" srclang="es" enabled>
+			</video>
+		</main>
+		<script type="module" src="/main.js"></script>
+	</body>
 </html>
