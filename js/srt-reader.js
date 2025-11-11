@@ -84,7 +84,7 @@ export default class SRTLector {
         // Solo actualizar si el subtítulo cambió
         if (this.hasSubtitleChanged(subtitle)) {
             this.currentSubtitle = subtitle;
-            
+
             // Llamar al callback si existe
             if (this.options.onSubtitleChange) {
                 this.options.onSubtitleChange(subtitle, currentTime);

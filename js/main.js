@@ -1,5 +1,4 @@
-import './style.css'
-import SRTLector from './src/srt-reader.js'
+import SRTLector from './srt-reader.js'
 
 class App {
   constructor() {
